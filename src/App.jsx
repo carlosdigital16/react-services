@@ -1,65 +1,16 @@
-import { useState } from 'react'
 import './App.css'
 import { useEffect } from 'react'
+import { useUsers } from './services/useUsers'
+import { useSelectedUsers } from './services/useSelectedUsers'
+import { useRemoveUserSelection } from './services/useRemoveUserSelection'
+import { useSelecteUser } from './services/useSelecteUser'
 
-const API_URL = 'https://6578d273f08799dc804619b0.mockapi.io/api/v1'
 
 export const App = () => {
-  const [selecteds, setSelecteds] = useState([])
-  const [users, setUsers] = useState([])
-  
-  const loadUsers = async () => {
-    try {
-      const response = await fetch(`${API_URL}/users`)
-      const data = await response.json()
-
-      setUsers(data)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-
-  const loadSelectedUsers = async () => {
-    try {
-      const response = await fetch(`${API_URL}/test`)
-      const data = await response.json()
-
-      setSelecteds(data)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-
-  const selectUser = async id => {
-    try {
-      await fetch(`${API_URL}/test`, {
-        method: 'POST',
-        headers: {'content-type':'application/json'},
-        body: JSON.stringify({ userId: id }),
-      })
-
-      loadSelectedUsers()
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const removeUserSelection = async userId => {
-
-    const { id } = selecteds.find((item) => item.userId == userId)
-    try {
-      await fetch(`${API_URL}/test/${id}`, {
-        method: 'DELETE',
-        headers: {'content-type':'application/json'},
-      })
-
-      loadSelectedUsers()
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  const { loadUsers, users } = useUsers()
+  const { loadSelectedUsers, selecteds } = useSelectedUsers()
+  const { removeUserSelection } = useRemoveUserSelection(selecteds, loadSelectedUsers)
+  const { selectUser } = useSelecteUser()
 
   useEffect(() => {
     loadUsers()
